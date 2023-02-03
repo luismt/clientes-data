@@ -1,2 +1,5 @@
 .vimspector.json
 db.sqlite3
+env/
+xls_files/
+xlsx_files/
