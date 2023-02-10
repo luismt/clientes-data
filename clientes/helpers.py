@@ -1,8 +1,11 @@
 import os
+from typing import Any
 from xls2xlsx import XLS2XLSX
 from openpyxl import load_workbook
 import pandas as pd
 from pandas._libs.tslibs.timestamps import Timestamp
+
+from clientes.models import Cliente, Reporte
 
 
 def convert_to_xlsx(file_name):
@@ -54,7 +57,7 @@ def squezze_contrato(df: pd.DataFrame):
 
 
 class Reportefile:
-    reporte_name: str
+    reporte_name: Any
     df: pd.DataFrame
     columns_to_drop = {
         "corriente": [0, 2, 3, 4, 5, 6,7,9,10, 11, 12,13, 14, 15,16,18,19, 20, 21, 22],
@@ -76,14 +79,17 @@ class Reportefile:
     def to_sql(self):
         self.xlsx_file = convert_to_xlsx(self.filename)
         self.base_df = get_base_df(self.xlsx_file)
-        self.time = get_date(self.base_df)
+        self.date = get_date(self.base_df)
         self.reporte_name = get_reporte_name(self.base_df)
         self.df = drop_columns(self.base_df, self.columns_to_drop.get(self.reporte_name))
         self.df = squezze_contrato(self.df)
         self.df.columns = self.columns_to_rename.get(self.reporte_name)
-        self.create_entries(self.df, reporte)
+        filename = self.filename + "x"
+        self.reporte = Reporte(filename=filename, date=self.date, report_type=self.reporte_name)
+        self.reporte.save()
+        self.create_entries(self.df, self.reporte)
 
     def create_entries(self, df, reporte):
-        Atrasado.objects.bulk_create(
-                Atrasado(reporte=reporte, **vals) for vals in df.to_dict("records")
+        Cliente.objects.bulk_create(
+                Cliente(reporte=reporte, **vals) for vals in df.to_dict("records")
                 )

@@ -1,5 +1,5 @@
 from django.contrib import admin
-from clientes.models import Atrasado, Reporte 
+from clientes.models import Cliente, Reporte 
 
-admin.site.register(Atrasado)
+admin.site.register(Cliente)
 admin.site.register(Reporte)

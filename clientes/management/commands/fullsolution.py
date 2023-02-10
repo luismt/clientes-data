@@ -12,7 +12,7 @@ class Command(BaseCommand):
         filt = filter(filter_zone, onus)
         maper = map(convert_onus, filt)
         active_users = [m for m in maper]
-        print("Active users = %s", len(active_users))
+        print("Active users = ", len(active_users))
 
 def filter_zone(onus):
     if onus.get("zone_name") == "Quattrocom" or onus.get("name") == "ANGEL SANTIAGO UITZIL YAMA":

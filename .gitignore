@@ -6,3 +6,4 @@ xls_files/
 xlsx_files/
 .ipynb_checkpoints/
 *.ipynb
+csv_files/

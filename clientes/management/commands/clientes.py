@@ -1,7 +1,7 @@
 from django.core.management.base import BaseCommand
 import os
 from clientes.models import Reporte
-from clientes.helpers import Reportfile
+from clientes.helpers import Reportefile
 
 
 class Command(BaseCommand):
@@ -9,11 +9,13 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
        self.set_params()
        self.file_list=self.get_files_list()
+       stop = 0
+       print(stop)
        for file in self.file_list:
            self.engage_reporte(file)
 
     def engage_reporte(self, file):
-        reporte = Reportfile(file) 
+        reporte = Reportefile(file) 
         reporte.to_sql()
 
     def set_params(self):
