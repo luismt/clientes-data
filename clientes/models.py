@@ -25,6 +25,7 @@ class Cliente(Base):
 
 class FullSolution(models.Model):
     contrato = models.CharField(max_length=100)
+    olt_name = models.CharField(max_length=100)
     source = models.CharField(max_length=100)
 
 from django.contrib.auth import get_user_model

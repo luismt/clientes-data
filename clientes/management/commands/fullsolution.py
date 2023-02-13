@@ -15,13 +15,26 @@ class Command(BaseCommand):
         load = options.get("load")
         if load[0] == "api":
             self.resolve_api()
-        elif load == "csv":
+        elif load[0] == "csv":
             self.resolve_csv()
 
     def resolve_csv(self):
         pwd = os.getcwd()
         csv_dir = "/csv_files/"
-        base_df = pd.read_csv(pwd + csv_dir)
+        file_name = "SmartOLT_onus_list_2023-02-10_22 18 24.311300.csv"
+        base_df = pd.read_csv(pwd + csv_dir + file_name)
+        cols = list(range(0, len(base_df.axes[1])))
+        cols.remove(4)
+        cols.remove(5)
+        df = base_df.drop(base_df.columns[cols], axis=1)
+        df = df[df.Name != "VIVEXUX APERTURAS"]
+        df = df[df.Name != "DEMETRIO LOPEZ MUKUL"]
+        df["Name"]=df["Name"].apply(lambda x: convert_name_to_contrato(x))
+        columns = ["contrato", "olt_name"]
+        df.columns = columns
+        FullSolution.objects.bulk_create(
+                FullSolution(source="csv", **vals) for vals in df.to_dict("records")
+                )
         
 
 
@@ -31,12 +44,10 @@ class Command(BaseCommand):
             response = requests.get(url, headers=headers)
             onus = response.json().get("onus")
             filt = filter(filter_zone, onus)
-            maper = map(convert_onus, filt)
-            active_users = [{"contrato": m} for m in maper]
+            active_users = map(convert_onus, filt)
             fullsolution = FullSolution.objects.bulk_create(
                     FullSolution(source="api", **vals) for vals in active_users
                     )
-            print("Active users = ", len(active_users))
 
 def filter_zone(onus):
     if onus.get("zone_name") == "Quattrocom" or onus.get("name") == "ANGEL SANTIAGO UITZIL YAMA":
@@ -49,12 +60,13 @@ def convert_onus(onus):
     # return convert
     if len(converted[0]) == 4:
         #print(onus.get("name"))
-        return converted[0] + "-" + converted[1]
+        contrato = converted[0] + "-" + converted[1]
     else:
         #print(onus.get("name"))
         homoclave = converted[1]
         cuenta = converted[0].split(" ")[-1:][0]
-        return cuenta + "-" + homoclave
+        contrato = cuenta + "-" + homoclave
+    return {"contrato": contrato, "olt_name": onus.get("olt_name")}
 
 def convert_name_to_contrato(name: str):
     if name == "VIVEXUX APERTURAS" or name == "DEMETRIO LOPEZ MUKUL":
@@ -67,7 +79,7 @@ def convert_name_to_contrato(name: str):
         cuenta = converted[0].split(" ")[-1:][0]
         return cuenta + "-" + homoclave
 
-def get_files_list(self):
+def get_files_list():
     filename_entries = [reporte.filename for reporte in Reporte.objects.all()]
-    file_list = os.listdir(self.PWD + self.xls_files)
+    file_list = os.listdir()
     return [item for item in file_list if item not in filename_entries]
