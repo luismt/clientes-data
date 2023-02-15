@@ -1,11 +1,26 @@
-from django.http.response import JsonResponse
+import csv
+from django.http.response import JsonResponse, HttpResponse
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from clientes.forms import TrackForm
-from clientes.models import Reporte
+from clientes.models import Reporte, FullSolution
 
 def index(request):
     return JsonResponse({"message": "Hello World!"})
+
+def audits_to_csv(request):
+
+    response = HttpResponse(
+        content_type='text/csv',
+        headers={'Content-Disposition': 'attachment; filename="somefilename.csv"'},
+    )
+
+    writer = csv.writer(response)
+    writer.writerow(["Contrato", "olt_name"])
+    for item in FullSolution.audits.all():
+        writer.writerow([item.contrato, item.olt_name])
+
+    return response
 
 @login_required
 def create_track(request):
