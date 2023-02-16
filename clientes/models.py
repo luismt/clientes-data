@@ -37,6 +37,7 @@ class FullSolution(models.Model):
     olt_name = models.CharField(max_length=100)
     source = models.CharField(max_length=100)
     audits = FullSolutionManager()
+    objects = models.Manager()
 
 
 

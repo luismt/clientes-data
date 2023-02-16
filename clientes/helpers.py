@@ -25,7 +25,7 @@ def get_pd_filt(df: pd.DataFrame, str_pattern: str):
     return df.apply(lambda r: r.astype('string').str.contains(str_pattern).any(), axis=1)
 
 def get_reporte_name(df: pd.DataFrame):
-    options = ['Supendidos', 'Desconectados', 'corriente', 'Adelantados' ]
+    options = ['Supendidos', 'Desconectados', 'corriente', 'Adelantados', 'Cortesía']
     for option in options:
         filt = get_pd_filt(df, option)
         row_labels = df[filt]
@@ -64,6 +64,7 @@ class Reportefile:
         "desconectados": [0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 13, 14, 15, 16, 18, 19],
         "supendidos": [0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 13, 14, 15, 16, 18, 19],
         "adelantados": [0, 2, 3, 4, 5, 6,7,9,10, 11, 12,13, 14, 15,16,18,19, 20, 21, 22],
+        "cortesía": [0,2, 3,4,5,6,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23],
     }
     
     columns_to_rename = {
@@ -71,6 +72,7 @@ class Reportefile:
         "desconectados": ["contrato", "servicio", "periodo"],
         "supendidos":["contrato", "servicio", "periodo"],
         "adelantados": ["contrato", "servicio", "periodo"],
+        "cortesía": ["contrato", "servicio"],
     }
     
     def __init__(self, filename):
@@ -82,7 +84,10 @@ class Reportefile:
         self.date = get_date(self.base_df)
         self.reporte_name = get_reporte_name(self.base_df)
         self.df = drop_columns(self.base_df, self.columns_to_drop.get(self.reporte_name))
-        self.df = squezze_contrato(self.df)
+        if self.reporte_name != "cortesía":
+            self.df = squezze_contrato(self.df)
+        else:
+            self.df.dropna(inplace=True)
         self.df.columns = self.columns_to_rename.get(self.reporte_name)
         filename = self.filename + "x"
         self.reporte = Reporte(filename=filename, date=self.date, report_type=self.reporte_name)
@@ -93,3 +98,10 @@ class Reportefile:
         Cliente.objects.bulk_create(
                 Cliente(reporte=reporte, **vals) for vals in df.to_dict("records")
                 )
+
+def get_audited_list():
+    filename = "google_drive/Clientes a compartir - Revision.csv"
+    base_df = pd.read_csv(filename)
+    records_dict = base_df.to_dict("records")
+    records_list = [item.get("contrato") for item in records_dict]
+    return records_list

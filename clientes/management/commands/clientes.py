@@ -25,7 +25,8 @@ class Command(BaseCommand):
         return
 
     def get_files_list(self):
-        filename_entries = [reporte.filename for reporte in Reporte.objects.all()]
+        filename_entries = [reporte.filename[:-1] for reporte in Reporte.objects.all() if Reporte.objects.all().count() > 0]
         file_list = os.listdir(self.PWD + self.xls_files)
-        file_list.remove(".DS_Store")
+        if ".DS_Store" in file_list:
+            file_list.remove(".DS_Store")
         return [item for item in file_list if item not in filename_entries]

@@ -21,14 +21,16 @@ class Command(BaseCommand):
     def resolve_csv(self):
         pwd = os.getcwd()
         csv_dir = "/csv_files/"
-        file_name = "SmartOLT_onus_list_2023-02-10_22 18 24.311300.csv"
+        file_name = "SmartOLT_onus_list_2023-02-15_22 54 18.352900.csv"        
         base_df = pd.read_csv(pwd + csv_dir + file_name)
+        base_df = base_df[base_df.Zone != "Quattrocom"]
         cols = list(range(0, len(base_df.axes[1])))
         cols.remove(4)
         cols.remove(5)
         df = base_df.drop(base_df.columns[cols], axis=1)
         df = df[df.Name != "VIVEXUX APERTURAS"]
         df = df[df.Name != "DEMETRIO LOPEZ MUKUL"]
+        df = df[df.Name != "ANGEL SANTIAGO UITZIL YAMA"]
         df["Name"]=df["Name"].apply(lambda x: convert_name_to_contrato(x))
         columns = ["contrato", "olt_name"]
         df.columns = columns
@@ -69,8 +71,9 @@ def convert_onus(onus):
     return {"contrato": contrato, "olt_name": onus.get("olt_name")}
 
 def convert_name_to_contrato(name: str):
-    if name == "VIVEXUX APERTURAS" or name == "DEMETRIO LOPEZ MUKUL":
+    if name == "VIVEXUX APERTURAS" or name in ["DEMETRIO LOPEZ MUKUL", "ANGEL SANTIAGO UITZIL YAMA"]:
         return
+    print(name)
     converted = name.split("-")[-2:]
     if len(converted[0]) == 4:
         return converted[0] + "-" + converted[1]

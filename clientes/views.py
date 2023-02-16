@@ -4,6 +4,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from clientes.forms import TrackForm
 from clientes.models import Reporte, FullSolution
+from clientes.helpers import get_audited_list
 
 def index(request):
     return JsonResponse({"message": "Hello World!"})
@@ -15,9 +16,16 @@ def audits_to_csv(request):
         headers={'Content-Disposition': 'attachment; filename="somefilename.csv"'},
     )
 
+    q = request.GET.get("q")
+
+    query = FullSolution.audits.all()
+    if q:
+        if q == "filter":
+            query = query.exclude(contrato__in=get_audited_list())
+
     writer = csv.writer(response)
     writer.writerow(["Contrato", "olt_name"])
-    for item in FullSolution.audits.all():
+    for item in query:
         writer.writerow([item.contrato, item.olt_name])
 
     return response
