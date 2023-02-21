@@ -8,20 +8,27 @@ from clientes.models import FullSolution
 class Command(BaseCommand):
 
 
+    def delete_entries(self):
+        FullSolution.objects.all().delete()
+
+
     def add_arguments(self, parser):
         parser.add_argument('--load', action='append',type=str)
 
     def handle(self, *args, **options):
+
         load = options.get("load")
         if load[0] == "api":
             self.resolve_api()
         elif load[0] == "csv":
             self.resolve_csv()
+        elif load[0] == "delete":
+            self.delete_entries()
 
     def resolve_csv(self):
         pwd = os.getcwd()
         csv_dir = "/csv_files/"
-        file_name = "SmartOLT_onus_list_2023-02-15_22 54 18.352900.csv"        
+        file_name = "SmartOLT_onus_list_2023-02-21_13 11 56.494400.csv"        
         base_df = pd.read_csv(pwd + csv_dir + file_name)
         base_df = base_df[base_df.Zone != "Quattrocom"]
         cols = list(range(0, len(base_df.axes[1])))

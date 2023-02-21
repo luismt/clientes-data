@@ -12,6 +12,7 @@ class Command(BaseCommand):
        stop = 0
        print(stop)
        for file in self.file_list:
+           print(file)
            self.engage_reporte(file)
 
     def engage_reporte(self, file):

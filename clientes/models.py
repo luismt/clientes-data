@@ -8,8 +8,13 @@ class Reporte(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+
     def __str__(self):
         return self.report_type + "-" + self.filename
+
+
+    def get_last_date_reportes(self):
+        return Reporte.objects.filter(date=Reporte.objects.all().order_by('date').last().date)
 
 
 class Base(models.Model):
@@ -23,13 +28,33 @@ class Base(models.Model):
         abstract = True
 
 
-class Cliente(Base):
-    pass
+class ClienteManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset()
 
+
+class SoftvManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(reporte__in=Reporte().get_last_date_reportes()).exclude(reporte__report_type__in=['instalado', 'cancelado'])
+
+
+class ClienteInstaladoManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(reporte__in=Reporte().get_last_date_reportes()).filter(reporte__report_type__in=['instalado',])
+
+class ClienteCanceladoManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(reporte__in=Reporte().get_last_date_reportes()).filter(reporte__report_type__in=['cancelado'])
+
+class Cliente(Base):
+    objects = ClienteManager()
+    softv = SoftvManager()
+    instalados = ClienteInstaladoManager()
+    cancelados = ClienteCanceladoManager()
 
 class FullSolutionManager(models.Manager):
     def get_queryset(self):
-        return super().get_queryset().exclude(contrato__in=[c.contrato for c in Cliente.objects.all()])
+        return super().get_queryset().exclude(contrato__in=[c.contrato for c in Cliente.softv.all()])
 
 
 class FullSolution(models.Model):

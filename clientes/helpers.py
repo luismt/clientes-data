@@ -25,7 +25,7 @@ def get_pd_filt(df: pd.DataFrame, str_pattern: str):
     return df.apply(lambda r: r.astype('string').str.contains(str_pattern).any(), axis=1)
 
 def get_reporte_name(df: pd.DataFrame):
-    options = ['Supendidos', 'Desconectados', 'corriente', 'Adelantados', 'Cortesía']
+    options = ['Supendidos', 'Desconectados', 'corriente', 'Adelantados', 'Cortesía', 'Instalado', 'Cancelado']
     for option in options:
         filt = get_pd_filt(df, option)
         row_labels = df[filt]
@@ -65,6 +65,8 @@ class Reportefile:
         "supendidos": [0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 13, 14, 15, 16, 18, 19],
         "adelantados": [0, 2, 3, 4, 5, 6,7,9,10, 11, 12,13, 14, 15,16,18,19, 20, 21, 22],
         "cortesía": [0,2, 3,4,5,6,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23],
+        "instalado": [0, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 14, 15, 16, 17, 18],
+        "cancelado": [0, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 14, 15, 16, 17, 18],
     }
     
     columns_to_rename = {
@@ -73,6 +75,8 @@ class Reportefile:
         "supendidos":["contrato", "servicio", "periodo"],
         "adelantados": ["contrato", "servicio", "periodo"],
         "cortesía": ["contrato", "servicio"],
+        "instalado": ["contrato", "servicio", "periodo"],
+        "cancelado": ["contrato", "servicio", "periodo"],
     }
     
     def __init__(self, filename):
