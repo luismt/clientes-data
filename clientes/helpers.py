@@ -5,7 +5,7 @@ from openpyxl import load_workbook
 import pandas as pd
 from pandas._libs.tslibs.timestamps import Timestamp
 
-from clientes.models import Cliente, Reporte
+from clientes.models import Cancelaciones, Cliente, Instalaciones, Reporte
 
 
 def convert_to_xlsx(file_name):
@@ -65,7 +65,7 @@ class Reportefile:
         "supendidos": [0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 13, 14, 15, 16, 18, 19],
         "adelantados": [0, 2, 3, 4, 5, 6,7,9,10, 11, 12,13, 14, 15,16,18,19, 20, 21, 22],
         "cortesía": [0,2, 3,4,5,6,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23],
-        "instalado": [0, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 14, 15, 16, 17, 18],
+        "instalado": [0, 2, 3, 4, 5, 6, 7, 8, 9, 11, 14, 15, 16, 17, 18],
         "cancelado": [0, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 14, 15, 16, 17, 18],
     }
     
@@ -75,8 +75,18 @@ class Reportefile:
         "supendidos":["contrato", "servicio", "periodo"],
         "adelantados": ["contrato", "servicio", "periodo"],
         "cortesía": ["contrato", "servicio"],
-        "instalado": ["contrato", "servicio", "periodo"],
+        "instalado": ["contrato", "servicio", "fecha", "periodo"],
         "cancelado": ["contrato", "servicio", "periodo"],
+    }
+
+    db_classes = {
+        "corriente": Cliente,
+        "desconectados": Cliente,
+        "supendidos":Cliente,
+        "adelantados": Cliente,
+        "cortesía": Cliente,
+        "instalado": Instalaciones,
+        "cancelado": Cancelaciones,
     }
     
     def __init__(self, filename):
@@ -99,8 +109,8 @@ class Reportefile:
         self.create_entries(self.df, self.reporte)
 
     def create_entries(self, df, reporte):
-        Cliente.objects.bulk_create(
-                Cliente(reporte=reporte, **vals) for vals in df.to_dict("records")
+        self.db_classes.get(self.reporte_name).objects.bulk_create(
+                self.db_classes.get(self.reporte_name)(reporte=reporte, **vals) for vals in df.to_dict("records")
                 )
 
 def get_audited_list():

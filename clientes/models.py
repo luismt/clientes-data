@@ -52,6 +52,12 @@ class Cliente(Base):
     instalados = ClienteInstaladoManager()
     cancelados = ClienteCanceladoManager()
 
+class Instalaciones(Base):
+    fecha = models.DateField()
+
+class Cancelaciones(Base):
+    pass
+
 class FullSolutionManager(models.Manager):
     def get_queryset(self):
         return super().get_queryset().exclude(contrato__in=[c.contrato for c in Cliente.softv.all()])
