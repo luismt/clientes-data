@@ -46,11 +46,21 @@ class ClienteCanceladoManager(models.Manager):
     def get_queryset(self):
         return super().get_queryset().filter(reporte__in=Reporte().get_last_date_reportes()).filter(reporte__report_type__in=['cancelado'])
 
+class ClienteSuspendidoManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(reporte__in=Reporte().get_last_date_reportes()).filter(reporte__report_type__in=['supendidos'])
+
+class ClienteDesconectadoManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(reporte__in=Reporte().get_last_date_reportes()).filter(reporte__report_type__in=['desconectados'])
+
 class Cliente(Base):
     objects = ClienteManager()
     softv = SoftvManager()
     instalados = ClienteInstaladoManager()
     cancelados = ClienteCanceladoManager()
+    suspendidos = ClienteSuspendidoManager()
+    desconectados = ClienteDesconectadoManager()
 
 class Instalaciones(Base):
     fecha = models.DateField()
@@ -69,8 +79,6 @@ class FullSolution(models.Model):
     source = models.CharField(max_length=100)
     audits = FullSolutionManager()
     objects = models.Manager()
-
-
 
 
 from django.contrib.auth import get_user_model
