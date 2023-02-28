@@ -6,6 +6,7 @@ import pandas as pd
 from pandas._libs.tslibs.timestamps import Timestamp
 
 from clientes.models import Cancelaciones, Cliente, Instalaciones, Reporte
+from servicio.models import Pendientes
 
 
 def convert_to_xlsx(file_name):
@@ -67,6 +68,7 @@ class Reportefile:
         "cortesía": [0,2, 3,4,5,6,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23],
         "instalado": [0, 2, 3, 4, 5, 6, 7, 8, 9, 11, 14, 15, 16, 17, 18],
         "cancelado": [0, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 14, 15, 16, 17, 18],
+        "pendientes": [0, 2, 5, 6, 7, 8, 9, 10, 12, 14, 15, 16],
     }
     
     columns_to_rename = {
@@ -77,6 +79,7 @@ class Reportefile:
         "cortesía": ["contrato", "servicio"],
         "instalado": ["contrato", "servicio", "fecha", "periodo"],
         "cancelado": ["contrato", "servicio", "periodo"],
+        "pendientes": ["orden", "contrato", "cliente", "fecha", "servicio"],
     }
 
     db_classes = {
@@ -87,6 +90,7 @@ class Reportefile:
         "cortesía": Cliente,
         "instalado": Instalaciones,
         "cancelado": Cancelaciones,
+        "pendientes": Pendientes,
     }
     
     def __init__(self, filename):
