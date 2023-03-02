@@ -26,7 +26,7 @@ def get_pd_filt(df: pd.DataFrame, str_pattern: str):
     return df.apply(lambda r: r.astype('string').str.contains(str_pattern).any(), axis=1)
 
 def get_reporte_name(df: pd.DataFrame):
-    options = ['Supendidos', 'Desconectados', 'corriente', 'Adelantados', 'Cortesía', 'Instalado', 'Cancelado']
+    options = ['Supendidos', 'Desconectados', 'corriente', 'Adelantados', 'Cortesía', 'Instalado', 'Cancelado', 'Pendientes']
     for option in options:
         filt = get_pd_filt(df, option)
         row_labels = df[filt]
