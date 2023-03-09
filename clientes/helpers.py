@@ -5,7 +5,7 @@ from openpyxl import load_workbook
 import pandas as pd
 from pandas._libs.tslibs.timestamps import Timestamp
 
-from clientes.models import Cancelaciones, Cliente, Instalaciones, Reporte
+from clientes.models import Cancelaciones, Cliente, Contrataciones, Instalaciones, Reporte
 from servicio.models import Pendientes
 
 
@@ -26,7 +26,7 @@ def get_pd_filt(df: pd.DataFrame, str_pattern: str):
     return df.apply(lambda r: r.astype('string').str.contains(str_pattern).any(), axis=1)
 
 def get_reporte_name(df: pd.DataFrame):
-    options = ['Supendidos', 'Desconectados', 'corriente', 'Adelantados', 'Cortesía', 'Instalado', 'Cancelado', 'Pendientes']
+    options = ['Supendidos', 'Desconectados', 'corriente', 'Adelantados', 'Cortesía', 'Instalado', 'Cancelado', 'Pendientes', 'Contratado', 'Instalar',]
     for option in options:
         filt = get_pd_filt(df, option)
         row_labels = df[filt]
@@ -69,6 +69,8 @@ class Reportefile:
         "instalado": [0, 2, 3, 4, 5, 6, 7, 8, 9, 11, 14, 15, 16, 17, 18],
         "cancelado": [0, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 14, 15, 16, 17, 18],
         "pendientes": [0, 2, 5, 6, 7, 8, 9, 10, 12, 14, 15, 16],
+        "contratado": [0, 2, 3, 4, 5, 6, 7, 8, 9, 11, 14, 15, 16, 17, 18],
+        "instalar": [0, 2, 3, 4, 5, 6, 7, 9, 10, 11, 12, 13, 14, 15, 16, 18, 19, 20, 21, 22],
     }
     
     columns_to_rename = {
@@ -80,6 +82,8 @@ class Reportefile:
         "instalado": ["contrato", "servicio", "fecha", "periodo"],
         "cancelado": ["contrato", "servicio", "periodo"],
         "pendientes": ["orden", "contrato", "cliente", "fecha", "servicio"],
+        "contratado": ["contrato", "servicio", "fecha", "periodo"],
+        "instalar": ["contrato", "servicio", "periodo"],
     }
 
     db_classes = {
@@ -91,6 +95,8 @@ class Reportefile:
         "instalado": Instalaciones,
         "cancelado": Cancelaciones,
         "pendientes": Pendientes,
+        "contratado": Contrataciones,
+        "instalar": Cliente, 
     }
     
     def __init__(self, filename):

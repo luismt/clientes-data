@@ -54,6 +54,14 @@ class ClienteDesconectadoManager(models.Manager):
     def get_queryset(self):
         return super().get_queryset().filter(reporte__in=Reporte().get_last_date_reportes()).filter(reporte__report_type__in=['desconectados'])
 
+class ClienteActivoManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(reporte__in=Reporte().get_last_date_reportes()).filter(reporte__report_type__in=['desconectados', 'corriente', 'adelantados'])
+
+class ClienteInactivoManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(reporte__in=Reporte().get_last_date_reportes()).filter(reporte__report_type__in=['supendidos', ])
+
 class Cliente(Base):
     objects = ClienteManager()
     softv = SoftvManager()
@@ -61,12 +69,17 @@ class Cliente(Base):
     cancelados = ClienteCanceladoManager()
     suspendidos = ClienteSuspendidoManager()
     desconectados = ClienteDesconectadoManager()
+    activos = ClienteActivoManager()
+    inactivos = ClienteInactivoManager()
 
 class Instalaciones(Base):
     fecha = models.DateField()
 
 class Cancelaciones(Base):
     pass
+
+class Contrataciones(Base):
+    fecha = models.DateField()
 
 class FullSolutionManager(models.Manager):
     def get_queryset(self):
